@@ -55,44 +55,102 @@ export default function Home() {
     // mapping from blendshapes -> emotions (simple heuristic weights)
     // Keys correspond to MediaPipe blendshape names; weights chosen heuristically.
     // This is a lightweight no-training mapping: you can replace or tune weights.
+    /**
+     * Heuristic mapping of MediaPipe Face Blendshapes to 6 basic emotions.
+     * Values are weights; you can tune them. Higher = more influence.
+     */
     const emotionWeights: Record<string, Record<string, number>> = {
-      // for each emotion, specify weights for a few high-signal blendshapes
       happy: {
-        mouthSmileLeft: 1.0,
-        mouthSmileRight: 1.0,
-        mouthOpen: 0.2,
+        mouthSmileLeft: 1.3,
+        mouthSmileRight: 1.3,
+
+        // Indians show subtle cheek + eye expression
+        eyeSquintLeft: 0.9,
+        eyeSquintRight: 0.9,
+
+        // Lip press is common while smiling in India
+        mouthPressLeft: 0.8,
+        mouthPressRight: 0.8,
+
+        // Eyebrow lift is a strong happiness sign
+        browOuterUpLeft: 0.7,
+        browOuterUpRight: 0.7,
+
+        // Dimples support happiness
+        mouthDimpleLeft: 0.5,
+        mouthDimpleRight: 0.5,
       },
+
       sad: {
-        mouthFrownLeft: 0.9,
-        mouthFrownRight: 0.9,
-        browInnerUp: 0.4,
+        // Most dominant sadness markers in Indian expressions
+        mouthShrugLower: 1.3,
+        mouthShrugUpper: 1.0,
+
+        // Subtle brow sadness cues
+        browInnerUp: 0.7,
+        browDownLeft: 0.6,
+        browDownRight: 0.6,
+
+        // Indians tighten eyes when sad instead of widening
+        eyeSquintLeft: 0.8,
+        eyeSquintRight: 0.8,
+
+        // Holding lips together when sad
+        mouthPressLeft: 0.7,
+        mouthPressRight: 0.5,
+
+        // Light frown contribution (because here it's very low)
+        mouthFrownLeft: 0.3,
+        mouthFrownRight: 0.3,
       },
+
       angry: {
-        browDownLeft: 0.9,
-        browDownRight: 0.9,
+        // Indian style anger: pouted lips + squint + slight brow down
+        mouthPucker: 1.2, // <-- BIG DIFFERENCE: detect pouted anger
+        eyeSquintLeft: 0.8,
+        eyeSquintRight: 0.8,
+        browDownLeft: 0.7,
+        browDownRight: 0.7,
+        jawForward: 0.6,
         noseSneerLeft: 0.3,
         noseSneerRight: 0.3,
+        eyeWideLeft: -0.7, // anger ≠ wide eyes
+        eyeWideRight: -0.7,
+        mouthSmileLeft: -1.0, // reduce “angry smiling” confusion
+        mouthSmileRight: -1.0,
       },
+
       surprised: {
-        eyesWideLeft: 0.9,
-        eyesWideRight: 0.9,
-        mouthOpen: 0.8,
+        eyeWideLeft: 1.0,
+        eyeWideRight: 1.0,
+        browInnerUp: 0.8,
+        browOuterUpLeft: 0.5,
+        browOuterUpRight: 0.5,
+        jawOpen: 0.8,
+        mouthPucker: -0.6, // avoids confusing “pout” as surprise
       },
+
       disgusted: {
-        noseSneerLeft: 0.9,
-        noseSneerRight: 0.9,
-        mouthFunnel: 0.2,
+        noseSneerLeft: 1.0,
+        noseSneerRight: 1.0,
+        upperLipRaiseLeft: 0.7,
+        upperLipRaiseRight: 0.7,
+        mouthPucker: 0.3, // in India, disgust often includes a small pout
+        eyeSquintLeft: 0.3,
+        eyeSquintRight: 0.3,
       },
+
       fearful: {
-        eyesWideLeft: 0.6,
-        eyesWideRight: 0.6,
-        browInnerUp: 0.6,
-        mouthOpen: 0.4,
+        eyeWideLeft: 0.9,
+        eyeWideRight: 0.9,
+        browInnerUp: 0.7,
+        mouthStretchLeft: 0.5,
+        mouthStretchRight: 0.5,
+        jawOpen: 0.5,
+        mouthPucker: 0.2, // fear sometimes has puckering
       },
-      neutral: {
-        // neutral is "low activation" — we will compute as inverse of others later
-        // leave weights empty; neutral will be computed from remainder
-      },
+
+      neutral: {},
     };
 
     // helper to compute emotion scores from blendshapes object
