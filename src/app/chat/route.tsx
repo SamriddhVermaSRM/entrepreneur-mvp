@@ -3,16 +3,16 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   const { image }: { image: string } = await req.json();
   const response = await fetch(
-    "http://localhost:8080/v1/chat/completions",
-    // "https://api.groq.com/openai/v1/chat/completions",
+    // "http://localhost:8080/v1/chat/completions",
+    "https://api.groq.com/openai/v1/chat/completions",
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer `,
+        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        // model: "meta-llama/llama-4-scout-17b-16e-instruct",
+        model: "meta-llama/llama-4-scout-17b-16e-instruct",
         messages: [
           {
             role: "user",

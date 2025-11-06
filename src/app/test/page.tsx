@@ -20,9 +20,7 @@ export default function Home() {
       const { FilesetResolver, FaceLandmarker } = vision;
 
       // FilesetResolver.forVisionTasks expects the wasm root (CDN or local)
-      const fileset = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm",
-      );
+      const fileset = await FilesetResolver.forVisionTasks("/wasm");
 
       setStatus("Creating FaceLandmarker...");
 
@@ -31,6 +29,7 @@ export default function Home() {
         baseOptions: {
           // point to your model placed in public/models/face_landmarker.task
           modelAssetPath: "/models/face_landmarker.task",
+          delegate: "GPU",
         },
         runningMode: "VIDEO",
         numFaces: 1,
@@ -285,10 +284,17 @@ export default function Home() {
       <h2>Minimal Emotion Detector (MediaPipe FaceLandmarker)</h2>
       <p style={{ color: "#666" }}>{status}</p>
 
-      <div style={{ position: "relative", display: "inline-block" }}>
+      <div
+        style={{
+          position: "relative",
+          display: "inline-block",
+          width: 640,
+          height: 360,
+        }}
+      >
         <video
           ref={videoRef}
-          style={{ width: 640, height: 360, borderRadius: 8 }}
+          style={{ width: 640, height: 360, borderRadius: 8, opacity: 0 }}
           playsInline
           // autoPlay
           muted
