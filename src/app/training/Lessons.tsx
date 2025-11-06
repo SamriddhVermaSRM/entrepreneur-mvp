@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-function Lessons({ question, setCur, cur, setFinished, emotion }) {
+function Lessons({ question, setCur, cur, setFinished, emotion }: any) {
   const [loadedAt, setLodedAt] = useState(Date.now());
   console.log(cur);
 
